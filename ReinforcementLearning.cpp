@@ -21,22 +21,33 @@ void printOut(int** grid){
   }
 }
 
+
+int** copyToArray(int** grid, int** gridNew){
+   for(int i = 0; i < 2; i++){
+      for(int j = 0; j < 3; j++){
+         grid[i][j] = gridNew[i][j];
+      }
+   }
+   return grid;
+}
+
 void iterate(int** grid, int** gridNew, vector<int*> directions, vector<int> numDirections, float discount){
-  cout << "Iterating\n" << endl;
+
+
   int c = 0;
   for(int i = 0; i < 2; i++){
     for(int j = 0; j < 3; j++){
       //cout << "Node " << c << " directions:" << endl;
       //cout << "Num directions: " << numDirections[c] << endl;
-      cout << "Node S" << c+1 << ": " << endl;
+      //cout << "Node S" << c+1 << ": " << endl;
       for(int k = 0; k < numDirections[c]; k++){
         float value = gridNew[i][j];
         float reward = 0;
         
         switch(directions[c][k]){
           case 0://Left
-            cout << "Left" << endl;
-            value = reward + (discount * gridNew[i][j-1]);
+            //cout << "Left" << endl;
+            value = reward + (discount * grid[i][j-1]);
             //cout << "VALUE IS: " << value << endl;
             if (value > gridNew[i][j]){
                gridNew[i][j] = value;
@@ -44,30 +55,30 @@ void iterate(int** grid, int** gridNew, vector<int*> directions, vector<int> num
             
             break;
           case 1://Up
-            cout << "Up" << endl;
+            //cout << "Up" << endl;
             if (j == 2 && i == 1){
                reward = 100.0f;
             }
-            value = reward + (discount * gridNew[i-1][j]);
+            value = reward + (discount * grid[i-1][j]);
             //cout << "VALUE IS: " << value << endl;
             if (value > gridNew[i][j]){
                gridNew[i][j] = value;
             }
             break;
           case 2://Right
-            cout << "Right" << endl;
+            //cout << "Right" << endl;
             if (j == 1 && i == 0){
                reward = 50.0f;
             }
-            value = reward + (discount * gridNew[i][j+1]);
+            value = reward + (discount * grid[i][j+1]);
             //cout << "VALUE IS: " << value << endl;
             if (value > gridNew[i][j]){
                gridNew[i][j] = value;
             }
             break;
           case 3://Down
-            cout << "Down" << endl;
-            value = reward + (discount * gridNew[i+1][j]);
+            //cout << "Down" << endl;
+            value = reward + (discount * grid[i+1][j]);
             //cout << "VALUE IS: " << value << endl;
             if (value > gridNew[i][j]){
                gridNew[i][j] = value;
@@ -80,8 +91,9 @@ void iterate(int** grid, int** gridNew, vector<int*> directions, vector<int> num
     }
   }
   printOut(gridNew);
-
+  grid = copyToArray(grid, gridNew);
 }
+
 
 int main(int argc, char *argv[]) {
 
@@ -116,8 +128,10 @@ int main(int argc, char *argv[]) {
   directions.push_back(direction5);
   directions.push_back(direction6);
 
-  iterate(grid, gridNew, directions, numDirections, discount);
-  
+  for (int i = 0; i < 5; i++){
+      cout << "Iteration: " << i << endl;
+      iterate(grid, gridNew, directions, numDirections, discount);
+  }
 
  // printOut(grid);
   return 0;
