@@ -1,1 +1,36 @@
 ANSWERS TO LAB 8
+
+QUESTION 1:
+
+It takes 5 iterations for the value iteration algorithm to converge.
+The 5th iteration has the same optimal values for each state as the 4th
+
+GRID:
+51.2 64 0 
+64 80 100 
+
+S1 = 51.2
+S2 = 64
+S3 = 0
+S4 = 64
+S5 = 80
+S6 = 100
+
+QUESTION 2:
+
+The optimal move for each state is as follows
+
+Optimal move for state 1 :RIGHT 
+Optimal move for state 2 :DOWN 
+Optimal move for state 3 :- (No move/Terminal state)
+Optimal move for state 4 :RIGHT 
+Optimal move for state 5 :RIGHT 
+Optimal move for state 6 :UP
+
+Thus the optimal policy is given by:
+
+S1 --> S2 --> S5 --> S6 --> S3 
+
+QUESTION 3:
+
+Yes you can change the reward function and keep the same optimal policy. The reward function for the 2 states that were given (50 and 100) for the 2 states leading to S3, you can change these such that they are still greater than 0 and the optimal policy should remain unchanged.

@@ -11,7 +11,9 @@
 
 using namespace std;
 
-void printOut(int** grid){
+bool converged = false;
+
+void printOut(float** grid){
   cout << "GRID: " << endl;
   for (int i = 0; i < 2; i++) {
     for (int j = 0; j < 3; j++) {
@@ -19,10 +21,23 @@ void printOut(int** grid){
     }
     cout << endl;
   }
+  cout << endl;
 }
 
+bool checkConverge(float** grid, float** gridNew){
+  bool flag = true;
+  for(int i = 0; i < 2; i++){
+     for(int j = 0; j < 3; j++){
+       if (grid[i][j] != gridNew[i][j]){
+         flag = false;
+       }
+     }
+  }
+  return flag;
+}
 
-int** copyToArray(int** grid, int** gridNew){
+float** copyToArray(float** grid, float** gridNew){
+
    for(int i = 0; i < 2; i++){
       for(int j = 0; j < 3; j++){
          grid[i][j] = gridNew[i][j];
@@ -31,8 +46,7 @@ int** copyToArray(int** grid, int** gridNew){
    return grid;
 }
 
-void iterate(int** grid, int** gridNew, vector<int*> directions, vector<int> numDirections, float discount){
-
+void iterate(float** grid, float** gridNew, vector<int*> directions, vector<int> numDirections, float discount, vector<int> &optimalDirections){
 
   int c = 0;
   for(int i = 0; i < 2; i++){
@@ -43,7 +57,7 @@ void iterate(int** grid, int** gridNew, vector<int*> directions, vector<int> num
       for(int k = 0; k < numDirections[c]; k++){
         float value = gridNew[i][j];
         float reward = 0;
-        
+
         switch(directions[c][k]){
           case 0://Left
             //cout << "Left" << endl;
@@ -51,10 +65,11 @@ void iterate(int** grid, int** gridNew, vector<int*> directions, vector<int> num
             //cout << "VALUE IS: " << value << endl;
             if (value > gridNew[i][j]){
                gridNew[i][j] = value;
+               optimalDirections[c] = 0;
             }
-            
+
             break;
-          case 1://Up
+          case 1://Up  vector<int> optimalDirections = vector<int>();
             //cout << "Up" << endl;
             if (j == 2 && i == 1){
                reward = 100.0f;
@@ -63,6 +78,7 @@ void iterate(int** grid, int** gridNew, vector<int*> directions, vector<int> num
             //cout << "VALUE IS: " << value << endl;
             if (value > gridNew[i][j]){
                gridNew[i][j] = value;
+               optimalDirections[c] = 1;
             }
             break;
           case 2://Right
@@ -74,6 +90,7 @@ void iterate(int** grid, int** gridNew, vector<int*> directions, vector<int> num
             //cout << "VALUE IS: " << value << endl;
             if (value > gridNew[i][j]){
                gridNew[i][j] = value;
+               optimalDirections[c] = 2;
             }
             break;
           case 3://Down
@@ -82,6 +99,7 @@ void iterate(int** grid, int** gridNew, vector<int*> directions, vector<int> num
             //cout << "VALUE IS: " << value << endl;
             if (value > gridNew[i][j]){
                gridNew[i][j] = value;
+               optimalDirections[c] = 3;
             }
             break;
 
@@ -91,29 +109,39 @@ void iterate(int** grid, int** gridNew, vector<int*> directions, vector<int> num
     }
   }
   printOut(gridNew);
+  if (checkConverge(grid, gridNew)){
+    converged = true;
+    cout << "CONVERGED!" << endl;
+  }
   grid = copyToArray(grid, gridNew);
 }
 
 
 int main(int argc, char *argv[]) {
 
-  cout << "REINFORCEMENT LEARNING LAB 8\n\n" << endl;
+  cout << "REINFORCEMENT LEARNING LAB 8\n" << endl;
 
   //Initialize array
-  int** grid = new int*[2];
+  float** grid = new float*[2];
   for (int i = 0; i < 2; i++){
-    grid[i] = new int[3];
+    grid[i] = new float[3];
   }
 
-  int** gridNew = new int*[2];
+  float** gridNew = new float*[2];
   for (int i = 0; i < 2; i++){
-    gridNew[i] = new int[3];
+    gridNew[i] = new float[3];
   }
+
+  cout << "STARTING GRID" << endl << endl;
+  printOut(gridNew);
+
 
   float discount = 0.8f;
   //Left = 0; Up = 1; Right = 2; Down = 3;
   vector<int*> directions = vector<int*>();
   vector<int> numDirections = {2,3,0,2,3,2};
+  vector<int> optimalDirections = {0,0,0,0,0,0};
+
   int direction1[2] = {2,3};
   int direction2[3] = {0,2,3};
   int direction3[0] = {};
@@ -128,11 +156,32 @@ int main(int argc, char *argv[]) {
   directions.push_back(direction5);
   directions.push_back(direction6);
 
-  for (int i = 0; i < 5; i++){
-      cout << "Iteration: " << i << endl;
-      iterate(grid, gridNew, directions, numDirections, discount);
+  int i = 1;
+
+  while (!converged){
+    cout << "Iteration: " << i << endl;
+    iterate(grid, gridNew, directions, numDirections, discount, optimalDirections);
+    i++;
   }
 
+  //Print optimnal route
+  cout << "\nOPTIMAL POLICY:" << endl;
+  for (int i = 0; i < optimalDirections.size(); ++i){
+    cout << "Optimal move for state " << i+1 << " :";
+    if (i == 2){
+      cout << "- " << endl;
+    } else {
+      if (optimalDirections[i] == 0){
+        cout << "LEFT " << endl;
+      } else if (optimalDirections[i] == 1){
+        cout << "UP " << endl;
+      } else if (optimalDirections[i] == 2){
+        cout << "RIGHT " << endl;
+      } else if (optimalDirections[i] == 3){
+        cout << "DOWN " << endl;
+      }
+    }
+  }
  // printOut(grid);
   return 0;
 }
